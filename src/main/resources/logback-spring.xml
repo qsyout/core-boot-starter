@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="false">
+
+	<springProperty scope="context" name="logPath" source="log.path" />
+
+	<!-- 控制台输出日志 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>[%-5level] %d{${DATETIME}} [%thread] %logger{36} - %m%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 文件日志 -->
+	<appender name="FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+			<Key>path</Key>
+			<DefaultValue>system</DefaultValue>
+		</discriminator>
+		<sift>
+			<appender name="FILE-${path}"
+				class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<prudent>true</prudent>
+				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<fileNamePattern>${logPath}/%d{yyyyMMdd}/${path}.%i.log
+					</fileNamePattern>
+					<timeBasedFileNamingAndTriggeringPolicy
+						class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+						<maxFileSize>10MB</maxFileSize>
+					</timeBasedFileNamingAndTriggeringPolicy>
+				</rollingPolicy>
+				<encoder>
+					<Pattern>%X{sn:-} %d{HH:mm:ss.SSS} [%logger{50}: %line] -
+						%msg%n
+					</Pattern>
+					<charset>utf-8</charset>
+				</encoder>
+			</appender>
+		</sift>
+	</appender>
+
+	<!-- 以最低的日志级别为准 -->
+	<root level="DEBUG">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<logger name="org.apache.http" level="INFO" />
+	<logger name="org.springframework.jdbc" level="DEBUG" />
+	<logger name="org.springframework.web.servlet.mvc.method.annotation"
+		level="DEBUG" />
+	<logger name="org.springframework" level="INFO" />
+	<logger name="com.zaxxer.hikari" level="INFO" />
+	<logger name="org.mybatis" level="INFO" />
+	<logger name="io.lettuce" level="INFO" />
+	<logger name="com.atomikos" level="INFO" />
+	<logger name="io.netty" level="INFO" />
+	<logger name="org.quartz" level="INFO" />
+	<logger name="de.codecentric" level="INFO" />
+
+</configuration>

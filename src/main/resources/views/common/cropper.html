@@ -1,0 +1,238 @@
+<script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+<link  href="${ctxPath}/cropper/cropper.min.css" rel="stylesheet">
+<script src="${ctxPath}/cropper/cropper.min.js"></script>
+<template id="cropper">
+	<div>
+		<el-upload
+		  class="avatar-uploader"
+		  :action="action"
+		  :show-file-list="false"
+		  accept="image/png, image/jpeg"
+		  :auto-upload="false"
+		  ref="cropperUpload"
+		  :http-request="upload"
+		  :on-change="changeImg">
+		   <img v-if="imageUrl" :src="imageUrl" class="avatar">
+  			<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+		</el-upload>
+		<div class="body-cover" v-show="cropperVisible"><!-- 绝对定位，将覆盖body背景 -->
+			<div class="cropper-dialog" v-bind:style="{width:cropperWidth+'px',height:cropperHeight+'px'}"><!-- 绝对定位，位于屏幕正中央 -->
+				<div class="fill content" v-bind:style="{height:(cropperHeight-40)+'px'}">
+					<img class="fill wrapper-image">
+				</div>
+				<div class="btns fill">
+					<span title="放大" class="el-icon-zoom-in cropper-btn" @click="zoomIn" style="color:#187FEA;"></span>
+					<span title="缩小" class="el-icon-zoom-out cropper-btn" @click="zoomOut" style="color:#187FEA;"></span>
+					<span title="向上" class="el-icon-top cropper-btn" @click="moveTop" style="color:#187FEA;"></span>
+					<span title="向下" class="el-icon-bottom cropper-btn" @click="moveBottom" style="color:#187FEA;"></span>
+					<span title="向左" class="el-icon-back cropper-btn" @click="moveLeft" style="color:#187FEA;"></span>
+					<span title="向右" class="el-icon-right cropper-btn" @click="moveRight" style="color:#187FEA;"></span>
+					<span title="向左旋转" class="el-icon-refresh-left cropper-btn" @click="rotateLeft" style="color:#187FEA;"></span>
+					<span title="向右旋转" class="el-icon-refresh-right cropper-btn" @click="rotateRight" style="color:#187FEA;"></span>
+					<span title="重置" class="el-icon-refresh cropper-btn" @click="reset" style="color:#187FEA;"></span>
+					<span title="确认" class="el-icon-check cropper-btn" @click="confirm" style="color:#59F50C;"></span>
+					<span title="取消" class="el-icon-close cropper-btn" @click="cancel" style="color:red;"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+<script>
+Vue.component('el-cropper', {
+	template:"#cropper",
+	props:['action','scale','width','rotate','zoom','move'],//action代表图片上传接口地址,scale代表截取比例（宽高比），width代表裁剪宽度，rotate代表旋转角度，zoom代表放大缩小倍数，move代表移动像素数
+	data(){
+		return{
+			imageUrl:'',
+			cropperVisible:false,
+			cropperWidth:500,//默认显示宽度500px
+			cropperHeight:540,//默认显示高度500
+			rotateNum:10,//默认旋转度数
+			zoomNum:0.3,//默认可缩放倍数0.3
+			moveNum:10,//默认可移动像素数10
+			cropperScale:1,//宽高比默认1:1
+			height:335
+		}
+	},
+	methods:{
+		handleAvatarSuccess(res, file) {
+	        this.imageUrl = URL.createObjectURL(file.raw);
+	      },
+	      changeImg(file, fileList){
+	    	  if(!file){
+	    		  return;
+	    	  }
+	    	  this.cropperVisible = true;
+	    	  var reader = new FileReader();  
+              let that = this;
+	          reader.onload = function(evt) {  
+	              // 更换cropper的图片  
+	              $('.wrapper-image').cropper('replace', evt.target.result, false);// 默认false，适应高度，不失真  
+	          }  
+	          reader.readAsDataURL(file.raw); 
+	      },
+	      cancel(){
+	    	  this.cropperVisible = !this.cropperVisible;
+	      },
+	      reset(){
+	    	  $('.wrapper-image').cropper('reset');
+	      },
+	      confirm(){
+	    	  this.upload(this.dataURLtoBlob($('.wrapper-image').cropper('getCroppedCanvas',{
+	    		  width:this.width,height:this.height
+	    	  }).toDataURL('image/jpeg')));
+	      },
+	      dataURLtoBlob: function(dataurl,filename) { 
+	          var arr = dataurl.split(','),
+	              mime = arr[0].match(/:(.*?);/)[1],
+	              bstr = atob(arr[1]),
+	              n = bstr.length,
+	              u8arr = new Uint8Array(n);
+	          while (n--) {
+	              u8arr[n] = bstr.charCodeAt(n);
+	          }
+	          return new File([u8arr], filename ? filename : Math.ceil(Math.random())*1000 * 1000 + ".jpg", {type:mime});
+	      },
+	      upload(file){
+	    	  var param = new FormData();
+	    	  param.append("file", file);
+	    	  axios.post(this.action,param,{headers:{'Content-Type':'multipart/form-data'},onUploadProgress: e => {
+	              var completeProgress = ((e.loaded / e.total * 100) | 0) + "%";
+	              this.progress = completeProgress;
+	            }})
+	          .then(response=>{
+	        	  this.imageUrl = response.data.data;
+		    	  this.cropperVisible = false;
+		    	  this.$emit("cropper",this.imageUrl);
+	          })
+	      },
+	      rotateLeft(){
+	    	  $('.wrapper-image').cropper('rotate',0 - this.rotateNum);
+	      },
+	      rotateRight(){
+	    	  $('.wrapper-image').cropper('rotate',this.rotateNum);
+	      },
+	      zoomIn(){
+	    	  $('.wrapper-image').cropper('zoom',this.zoomNum);
+	      },
+	      zoomOut(){
+	    	  $('.wrapper-image').cropper('zoom',0 - this.zoomNum);
+	      },
+	      moveTop(){
+	    	  $('.wrapper-image').cropper('move',0,0 - this.moveNum);
+	      },
+	      moveBottom(){
+	    	  $('.wrapper-image').cropper('move',0,this.moveNum);
+	      },
+	      moveLeft(){
+	    	  $('.wrapper-image').cropper('move',0 - this.moveNum,0);
+	      },
+	      moveRight(){
+	    	  $('.wrapper-image').cropper('move',this.moveNum,0);
+	      }
+	},
+	created(){
+		if(typeof this.scale === 'number'&&this.scale > 0){ //可设置的宽高比，不传则默认使用1:1
+			this.cropperScale = this.scale;
+		}
+		if(typeof this.width === 'number'&&this.width > 0){ // 需要的裁剪宽度
+			if(this.width > 335){//最小可显示宽度500
+				this.cropperWidth = this.width*1.5;
+			}
+			this.cropperHeight = this.cropperWidth/this.cropperScale + 40;
+			this.height = this.width/this.cropperScale;
+		}else{
+			this.width = 335;
+		}
+		
+		if(typeof this.rotate === 'number'&&this.rotate > 0){//可设置的旋转度数，默认10度
+			this.rotateNum = this.rotate;
+		}
+		if(typeof this.zoom === 'number'&&this.zoom > 0){//可设置的缩放比例，默认0.3
+			this.zoomNum = this.zoom;
+		}
+		if(typeof this.move === 'number'&&this.move > 0){//可设置的移动像素数，默认10
+			this.moveNum = this.move;
+		}
+		var options = {  
+		        'aspectRatio' : this.cropperScale,// 裁剪图片宽高比
+		        'autoCropArea' : 0.8, // 原始图片缩放比例 
+		        'movable' : true, // 是否允许移动图片  
+		        'cropBoxResizable' : false, // 是否允许改变裁剪框的大小--->通过固定比例裁剪
+		        'dragMode':'move',//'crop':创建一个新的裁剪框    'move':移动画布  'none':do nothing
+		        'zoomable' : true, // 是否允许缩放图片  
+		        'mouseWheelZoom' : true, // 是否允许通过鼠标滚轮来缩放图片  
+		        'touchDragZoom' : false, // 是否允许通过触摸移动来缩放图片  
+		        'rotatable' : true, // 是否允许旋转图片  
+		        'minCropBoxWidth':this.width,
+		        'minCropBoxHeight':this.height
+		};
+		$.fn.cropper.setDefaults(options);
+	}
+});
+</script>
+<style>
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+ .body-cover{
+ 	background-color: rgba(0, 0, 0,0.2);
+ 	position: fixed;
+ 	left: 0;
+ 	right: 0;
+ 	top:0;
+ 	bottom: 0;
+ 	overflow: auto;
+    margin: 0;
+    z-index: 1999;
+ }
+ .cropper-dialog{
+ 	  position: absolute;
+	  left: 50%;
+	  top: 50%;
+	  transform: translate(-50%,-50%);
+	  z-index: 2000;
+ }
+ .cropper-dialog .fill{
+ 	width: 100%;
+ }
+ .cropper-dialog .content{
+ 	overflow: hidden;
+ }
+ .cropper-dialog .btns{
+ 	height: 40px;
+ 	text-align: right;
+ }
+.cropper-dialog .cropper-btn{
+ 	width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 25px;
+    font-weight:bold;
+ }
+.cropper-btn:HOVER {
+    cursor: pointer;
+	background-color: white;
+}
+</style>
