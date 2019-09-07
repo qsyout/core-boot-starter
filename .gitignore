@@ -1,3 +1,18 @@
+<<<<<<< HEAD
 /target/
 /.settings/
 /.classpath
+=======
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
+!/.mvn/wrapper/maven-wrapper.jar
+>>>>>>> ea305ecddc87a6c90525d9a109b9f8385fc4381e
