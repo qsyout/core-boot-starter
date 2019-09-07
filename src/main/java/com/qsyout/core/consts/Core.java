@@ -6,7 +6,7 @@ public interface Core {
 	String LOCAL_PATH = "localPath";
 	String REQUEST_IP = "requestIP";
 	String REQUEST_URL = "requestUrl";
-	String API_SUFFIX_PATTERN = "com.qsyout.modules";
+	String API_PREFIX_PATH = "com.qsyout.modules";
 	
 	String CONTENT_TYPE = "content-type";
 	String APPLICATION_JSON = "json";

@@ -3,6 +3,7 @@ package com.qsyout.core.mvc.regist;
 import java.lang.reflect.Method;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.qsyout.core.base.BaseService;
@@ -18,11 +19,13 @@ public class JsonApiRegistService {
 	
 	@Autowired
 	JsonHandlerMapping handlerMapping;
+	@Autowired
+	Environment env;
 
 	@SuppressWarnings("rawtypes")
 	public void regist(BaseService json){
 		try {
-			String packageName = json.getClass().getPackage().getName().replaceFirst(Core.API_SUFFIX_PATTERN + ".", "/");
+			String packageName = json.getClass().getPackage().getName().replaceFirst(env.getProperty("api.prefix.path", Core.API_PREFIX_PATH) + ".", "/");
 			String clazzName = json.getClass().getSimpleName();
 			String url = packageName.replace(".", "/") + "/" + String.valueOf(clazzName.charAt(0)).toLowerCase() + clazzName.substring(1, clazzName.lastIndexOf("Service"))
 				+ "." +  defaultSuffix;
