@@ -9,14 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface UserPermission {
+public @interface Permission {
 	
-	String name() default "请求未定义";
-
-	boolean open() default false;
-
 	boolean control() default true;
-
-	boolean log() default true;
-
 }

@@ -17,20 +17,15 @@ import com.qsyout.core.base.ContextViewValRegist;
 @Configuration
 public class BeetlConfig {
 
-	@Autowired
-	Environment env;
-	@Autowired(required=false)
-	ContextViewValRegist regist;
-
 	@Bean
-	public ClasspathResourceLoader createClasspathResourceLoader() {
+	public ClasspathResourceLoader createClasspathResourceLoader(Environment env) {
 		ClasspathResourceLoader loader = new ClasspathResourceLoader("views", "UTF-8");
 		loader.setAutoCheck("dev".equals(env.getProperty("spring.profiles.active", "prod")));
 		return loader;
 	}
 
 	@Bean(initMethod = "init")
-	public BeetlGroupUtilConfiguration getBeetlGroupUtilConfiguration(ClasspathResourceLoader loader) {
+	public BeetlGroupUtilConfiguration getBeetlGroupUtilConfiguration(ClasspathResourceLoader loader,@Autowired(required=false) ContextViewValRegist regist) {
 		BeetlGroupUtilConfiguration config = new BeetlGroupUtilConfiguration();
 		config.setResourceLoader(loader);
 		if (regist != null) {

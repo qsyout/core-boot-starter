@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.method.HandlerMethod;
 
 import com.qsyout.core.annotation.JsonResult;
-import com.qsyout.core.annotation.UserPermission;
+import com.qsyout.core.annotation.Permission;
 
 public class ProxyHandlerMethod extends HandlerMethod {
 	
@@ -28,7 +28,7 @@ public class ProxyHandlerMethod extends HandlerMethod {
 		}
 	}
 	
-	@UserPermission
+	@Permission
 	@JsonResult
 	public final Object proxy(HttpServletRequest request,@RequestBody Object params){
 		return null;
@@ -54,8 +54,7 @@ public class ProxyHandlerMethod extends HandlerMethod {
 	}
 	
 	private <A> boolean hasProxyMethodAnnotation(Class<A> annotationType) {
-		if(annotationType.getTypeName().equals("com.qsyout.core.annotation.UserPermission")
-				||annotationType.getTypeName().equals("com.qsyout.core.annotation.JsonResult")){
+		if(annotationType.getTypeName().equals("com.qsyout.core.annotation.JsonResult")){
 			return true;
 		}
 		return false;

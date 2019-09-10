@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 
-import com.qsyout.core.mvc.intercept.CoreInterceptor;
+import com.qsyout.core.mvc.intercept.CredentialsInterceptor;
 import com.qsyout.core.util.WebUtil;
 
 @Component
 public class JsonHandlerMapping extends AbstractHandlerMapping implements InitializingBean {
 
 	@Autowired
-	CoreInterceptor interceptor;
+	CredentialsInterceptor interceptor;
 	
 	private Map<String, HandlerMethod> apis = new HashMap<String, HandlerMethod>();
 	private Logger logger = LoggerFactory.getLogger(this.getClass());

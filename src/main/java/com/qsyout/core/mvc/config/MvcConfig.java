@@ -23,7 +23,7 @@ import com.qsyout.core.ex.BaseException;
 import com.qsyout.core.ex.impl.ArgValidateException;
 import com.qsyout.core.ex.impl.BusinessException;
 import com.qsyout.core.ex.impl.ForbiddenException;
-import com.qsyout.core.mvc.intercept.CoreInterceptor;
+import com.qsyout.core.mvc.intercept.CredentialsInterceptor;
 
 @Configuration
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -32,7 +32,7 @@ public class MvcConfig implements WebMvcConfigurer {
 	@Autowired
 	Environment env;
 	@Autowired
-	CoreInterceptor interceptor;
+	CredentialsInterceptor interceptor;
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 

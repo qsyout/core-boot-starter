@@ -2,7 +2,6 @@ package com.qsyout.core.config;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,24 +10,16 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.ResourceUtils;
 
 import com.qsyout.core.base.FileService;
-import com.qsyout.core.base.RequestAround;
-import com.qsyout.core.base.impl.DefaultInterceptor;
 import com.qsyout.core.base.impl.LocaleFileService;
 import com.qsyout.core.consts.Core;
-import com.qsyout.core.mvc.intercept.CoreInterceptor;
 
 @Configuration
 @ComponentScan("com.qsyout.core")
 public class DefaultConfig {
 	
-	@Autowired
-	Environment env;
-	@Autowired
-	CoreInterceptor interceptor;
-	
 	@Bean
 	@ConditionalOnMissingBean(FileService.class)
-	public FileService createDefaultFileService(){
+	public FileService createDefaultFileService(Environment env){
 		String[] locations = env.getProperty(Core.STATIC_LOCATIONS, "").split(",");
 		
 		for (int i = 0; i < locations.length; i++) {
@@ -43,12 +34,6 @@ public class DefaultConfig {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	@Bean
-	@ConditionalOnMissingBean(RequestAround.class)
-	public RequestAround createRequestAround(){
-		return new DefaultInterceptor();
 	}
 	
 }

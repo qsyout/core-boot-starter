@@ -20,8 +20,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.qsyout.core.annotation.UserPermission;
-import com.qsyout.core.mvc.intercept.CoreInterceptor;
+import com.qsyout.core.annotation.Permission;
+import com.qsyout.core.mvc.intercept.CredentialsInterceptor;
 import com.qsyout.core.util.StringUtil;
 import com.qsyout.core.util.WebUtil;
 
@@ -29,7 +29,7 @@ import com.qsyout.core.util.WebUtil;
 public class BeetlHandlerMapping extends AbstractHandlerMapping implements InitializingBean {
 
 	@Autowired
-	CoreInterceptor interceptor;
+	CredentialsInterceptor interceptor;
 	@Autowired
 	RequestMappingHandlerMapping requestMappingHandlerMapping;
 
@@ -98,7 +98,7 @@ public class BeetlHandlerMapping extends AbstractHandlerMapping implements Initi
 	
 	public static class ViewController{
 		
-		@UserPermission(open=false,log=true)
+		@Permission
 		public String view(HttpServletRequest request){
 			return WebUtil.getPathWithinApplication(request);
 		}
